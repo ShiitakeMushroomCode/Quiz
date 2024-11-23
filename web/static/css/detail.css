@@ -41,7 +41,6 @@
 	padding: 10px;
 	border-radius: 5px;
 	height: 700px;
-	overflow-y: auto;
 }
 
 .comment-box h2 {
@@ -49,6 +48,7 @@
 	margin: 0 0 10px 0;
 }
 
+/* 댓글 입력 */
 .comment-input {
 	display: flex;
 	flex-direction: column;
@@ -56,29 +56,71 @@
 	margin-bottom: 20px;
 }
 
-.comment-input input[type="text"],
-.comment-input input[type="password"],
 .comment-input textarea {
 	width: 100%;
+	height: calc(1.2em * 3 + 16px);
+	padding: 8px;
+	resize: none;
+	overflow-y: auto;
+	border: none;
+	border-radius: 10px;
+	background-color: #f5f5f5;
+}
+
+.input-row {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.comment-input input[type="text"] {
 	padding: 8px;
 	border: 1px solid #cccccc;
-	border-radius: 5px;
+	border-radius: 20px;
+	width: 40%;
+}
+
+.comment-input input[type="password"] {
+	padding: 8px;
+	border: 1px solid #cccccc;
+	border-radius: 20px;
+	width: 40%;
 }
 
 .comment-input button {
-	align-self: flex-end;
 	padding: 8px 16px;
 	background-color: #3ca0e0;
 	color: white;
 	border: none;
 	cursor: pointer;
-	border-radius: 5px;
+	border-radius: 20px;
+	height: 100%;
+	width: 20%;
+	transition: background-color 0.3s, transform 0.2s;
 }
+
+.comment-input button:hover {
+	background-color: #2a82b8;
+}
+
+.comment-input button:active {
+	background-color: #1f6a94;
+	transform: scale(0.95);
+}
+
 
 .comment-list {
 	display: flex;
 	flex-direction: column;
 	gap: 15px;
+	height: 510px;
+	overflow-y: auto;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.comment-list::-webkit-scrollbar {
+	display: none;
 }
 
 .comment-item {
@@ -95,9 +137,22 @@
 	background: none;
 	border: none;
 	cursor: pointer;
-	font-size: 16px;
-	color: #c00;
+	font-size: 1rem;
+	margin-top: 5px;
+	padding: 5px;
+	border-radius: 50%;
+	transition: background-color 0.2s, transform 0.2s;
 }
+
+.delete-btn:hover {
+	background-color: rgba(255, 0, 0, 0.1);
+}
+
+.delete-btn:active {
+	background-color: rgba(255, 0, 0, 0.2);
+	transform: scale(0.95);
+}
+
 
 /* 버튼 스타일 */
 .footer-buttons {

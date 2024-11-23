@@ -8,6 +8,9 @@
 		<div class="comment-list">
 			<%@ include file="/WEB-INF/components/commentBox/commentItem.jsp" %>
 			<%@ include file="/WEB-INF/components/commentBox/commentItem.jsp" %>
+			<%@ include file="/WEB-INF/components/commentBox/commentItem.jsp" %>
+			<%@ include file="/WEB-INF/components/commentBox/commentItem.jsp" %>
+			<%@ include file="/WEB-INF/components/commentBox/commentItem.jsp" %>
 		</div>
 	</div>
 </td>
