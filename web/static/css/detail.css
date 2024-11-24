@@ -168,4 +168,14 @@
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
+	transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.footer-buttons button:hover {
+	background-color: #2a80b0;
+}
+
+.footer-buttons button:active {
+	background-color: #1e5f84;
+	transform: scale(0.95);
 }

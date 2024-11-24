@@ -57,7 +57,6 @@
         .home-button {
             align-items: center;
             justify-content: center;
-            padding: 1rem;
             background-color: #3ca0e0;
             border: none;
             border-radius: 5px;
