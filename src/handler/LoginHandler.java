@@ -9,9 +9,9 @@ import java.util.List;
 
 public class LoginHandler implements Handler {
 
-	@Override
-	public String handleRequest(HttpServletRequest request, HttpServletResponse response) {
-		return "login";
-	}
+    @Override
+    public String handleRequest(HttpServletRequest request, HttpServletResponse response) {
+        return "login";
+    }
 
 }

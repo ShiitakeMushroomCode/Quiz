@@ -3,19 +3,19 @@
 <%@ page import="model.Quiz" %>
 
 <%
-  int offset = request.getParameter("offset") != null ? Integer.parseInt(request.getParameter("offset")) : 0;
-  int size = request.getParameter("size") != null ? Integer.parseInt(request.getParameter("size")) : 24;
+  List<Quiz> quizzes = (List<Quiz>) request.getAttribute("quizzes");
 
-  // QuizDAO를 통해 데이터 가져오기
-  dao.QuizDAO quizDAO = new dao.QuizDAO();
-  List<model.Quiz> quizzes = quizDAO.getQuizzesByOffset(offset, size);
+  if (quizzes == null || quizzes.isEmpty()) {
+    // 더 이상 로드할 퀴즈가 없음
+    out.print("");
+    return;
+  }
 
-  // 데이터를 출력
   for (Quiz quiz : quizzes) {
     String imageSrc = request.getContextPath() + "/static/images/" + quiz.getQuizId() + "/Thumbnail.WebP";
 %>
 <div class="quiz-item">
-  <img src="<%= imageSrc %>" alt="Quiz Image">
+  <img src="<%= imageSrc %>" alt="Quiz Image" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200';">
   <h3><%= quiz.getQuizName() %></h3>
   <p><%= quiz.getExp() %></p>
 </div>

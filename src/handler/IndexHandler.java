@@ -9,13 +9,13 @@ import java.util.List;
 
 public class IndexHandler implements Handler {
 
-	@Override
-	public String handleRequest(HttpServletRequest request, HttpServletResponse response) {
-		QuizDAO quizDAO = new QuizDAO();
-		List<Quiz> quizzes = quizDAO.getAllQuizzes();
+    @Override
+    public String handleRequest(HttpServletRequest request, HttpServletResponse response) {
+        QuizDAO quizDAO = new QuizDAO();
+        List<Quiz> quizzes = quizDAO.getQuizzesByOffset(1, 12);
 
-		request.setAttribute("quizzes", quizzes);
-		return "index";
-	}
+        request.setAttribute("quizzes", quizzes);
+        return "index";
+    }
 
 }

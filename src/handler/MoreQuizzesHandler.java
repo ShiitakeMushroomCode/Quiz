@@ -1,28 +1,39 @@
 package handler;
 
-import bean.DetailData;
+import dao.QuizDAO;
+import model.Quiz;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
-public class DetailHandler implements Handler {
+public class MoreQuizzesHandler implements Handler {
     @Override
     public String handleRequest(HttpServletRequest request, HttpServletResponse response) {
-        String id = request.getParameter("id");
-        if (id.isEmpty()) {
-            return "notFound"; // id가 없는 경우 처리
-        }
-        // DetailData Bean 생성 및 데이터 설정
-        DetailData detailData = new DetailData();
-        detailData.setId(id);
-        detailData.setN1("10");
-        detailData.setN2("20");
-        detailData.setN3("30");
-        detailData.setN4("50");
-        detailData.setExp("이 항목의 설명입니다.");
+        try {
+            int offset = 0;
+            int size = 24;
 
-        // Bean을 request에 설정
-        request.setAttribute("detailData", detailData);
-        return "detail"; // 정상적으로 처리된 경우
+            if (request.getParameter("offset") != null) {
+                offset = Integer.parseInt(request.getParameter("offset"));
+            }
+            if (request.getParameter("size") != null) {
+                size = Integer.parseInt(request.getParameter("size"));
+            }
+
+            // QuizDAO를 통해 데이터 가져오기
+            QuizDAO quizDAO = new QuizDAO();
+            List<Quiz> quizzes = quizDAO.getQuizzesByOffset(offset, size);
+
+            // 데이터를 요청 객체에 저장
+            request.setAttribute("quizzes", quizzes);
+
+            // 뷰 이름 반환
+            return "loadMoreQuizzes";
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "퀴즈를 로드하는 중 오류가 발생했습니다.");
+            return "error"; // 에러 페이지로 이동
+        }
     }
 }
-

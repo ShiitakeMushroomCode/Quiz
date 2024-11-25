@@ -6,7 +6,7 @@
 	<div class="container">
 		<img src="${pageContext.request.contextPath}/static/icons/favicon.ico"
 			alt="로고"
-			onclick="location.href='${pageContext.request.contextPath}/views/'" />
+			onclick="location.href='${pageContext.request.contextPath}/views/index'" />
 
 		<div class="button-group">
 			<%

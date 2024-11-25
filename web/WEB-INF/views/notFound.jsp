@@ -64,7 +64,7 @@ body {
 		<h1>페이지를 찾을 수 없습니다</h1>
 		<p>요청하신 페이지가 존재하지 않습니다.</p>
 		<p>URL을 확인하거나 아래 버튼을 클릭하여 홈으로 돌아가세요.</p>
-		<a href="${pageContext.request.contextPath}/views/">홈으로 돌아가기</a>
+		<a href="${pageContext.request.contextPath}/views/index">홈으로 돌아가기</a>
 	</div>
 </body>
 </html>
