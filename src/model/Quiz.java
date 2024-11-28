@@ -11,6 +11,10 @@ public class Quiz {
     private String release;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private short n1;
+    private short n2;
+    private short n3;
+    private short n4;
 
     public int getQuizId() {
         return quizId;
@@ -74,6 +78,38 @@ public class Quiz {
 
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public short getN1() {
+        return n1;
+    }
+
+    public void setN1(short n1) {
+        this.n1 = n1;
+    }
+
+    public short getN2() {
+        return n2;
+    }
+
+    public void setN2(short n2) {
+        this.n2 = n2;
+    }
+
+    public short getN3() {
+        return n3;
+    }
+
+    public void setN3(short n3) {
+        this.n3 = n3;
+    }
+
+    public short getN4() {
+        return n4;
+    }
+
+    public void setN4(short n4) {
+        this.n4 = n4;
     }
 
 }

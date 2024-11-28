@@ -14,6 +14,6 @@ public class MyQuizHandler implements Handler {
         }
 
         // 로그인 상태라면 내 퀴즈 페이지로 이동
-        return "myquiz";
+        return "/views/myquiz";
     }
 }

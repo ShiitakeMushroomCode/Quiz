@@ -3,12 +3,21 @@ package bean;
 import java.io.Serializable;
 
 public class DetailData implements Serializable {
+    private String title;
     private String id;
     private String n1;
     private String n2;
     private String n3;
     private String n4;
     private String exp;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getId() {
         return id;

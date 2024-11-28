@@ -101,7 +101,7 @@ public class FrontController extends HttpServlet {
         }
 
         // JSP 뷰로 포워딩
-        String view = "/WEB-INF/views/" + viewName + ".jsp";
+        String view = "/WEB-INF" + viewName + ".jsp";
         RequestDispatcher dispatcher = request.getRequestDispatcher(view);
         dispatcher.forward(request, response);
     }

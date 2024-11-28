@@ -7,7 +7,7 @@ public class NullHandler implements Handler {
 
     @Override
     public String handleRequest(HttpServletRequest request, HttpServletResponse response) {
-        return "notFound";
+        return "/views/notFound";
     }
 
 }

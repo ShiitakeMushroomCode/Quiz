@@ -25,15 +25,21 @@ public class MoreQuizzesHandler implements Handler {
             QuizDAO quizDAO = new QuizDAO();
             List<Quiz> quizzes = quizDAO.getQuizzesByOffset(offset, size);
 
+            if (quizzes.isEmpty()) {
+                // 더 이상 로드할 퀴즈가 없음
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                return null;
+            }
+
             // 데이터를 요청 객체에 저장
             request.setAttribute("quizzes", quizzes);
 
             // 뷰 이름 반환
-            return "loadMoreQuizzes";
+            return "/components/loadMoreQuizzes";
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "퀴즈를 로드하는 중 오류가 발생했습니다.");
-            return "error"; // 에러 페이지로 이동
+            return "/views/error"; // 에러 페이지로 이동
         }
     }
 }

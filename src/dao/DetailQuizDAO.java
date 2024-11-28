@@ -8,8 +8,5 @@ import model.DetailQuiz;
 public class DetailQuizDAO {
     private Connection conn;
 
-    public DetailQuizDAO() {
-        conn = DBConnection.getConnection();
-    }
 
 }

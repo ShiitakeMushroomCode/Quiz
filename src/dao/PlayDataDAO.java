@@ -8,7 +8,4 @@ import model.PlayData;
 public class PlayDataDAO {
     private Connection conn;
 
-    public PlayDataDAO() {
-        conn = DBConnection.getConnection();
-    }
 }

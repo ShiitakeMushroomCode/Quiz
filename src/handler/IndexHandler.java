@@ -15,7 +15,7 @@ public class IndexHandler implements Handler {
         List<Quiz> quizzes = quizDAO.getQuizzesByOffset(1, 12);
 
         request.setAttribute("quizzes", quizzes);
-        return "index";
+        return "/views/index";
     }
 
 }

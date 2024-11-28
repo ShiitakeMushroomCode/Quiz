@@ -78,6 +78,7 @@
             transform: translateY(1px);
         }
     </style>
+    <link rel="icon" href="<%= request.getContextPath() %>/static/icons/favicon.ico">
 </head>
 <body>
 <div class="login-card">
@@ -86,7 +87,7 @@
             onclick="location.href='<%=request.getContextPath()%>/oauth/kakao'">
         <img src="<%=request.getContextPath()%>/static/icons/KakaoLoginBtn.png" alt="카카오 로그인">
     </button>
-    <a href="<%=request.getContextPath()%>/views/" class="home-button">기본 화면으로 가기</a>
+    <a href="<%=request.getContextPath()%>/views/index" class="home-button">기본 화면으로 가기</a>
 </div>
 </body>
 </html>

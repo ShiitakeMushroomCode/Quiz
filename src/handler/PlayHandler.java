@@ -15,6 +15,6 @@ public class PlayHandler implements Handler {
 
         request.setAttribute("id", id);
         request.setAttribute("count", count);
-        return "quizPlay";
+        return "/views/quizPlay";
     }
 }

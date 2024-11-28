@@ -1,37 +1,45 @@
 package db;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnection {
-    private static Connection conn = null;
+    private static HikariDataSource dataSource;
 
-    // 데이터베이스 연결 메서드
-    public static Connection getConnection() {
-        if (conn == null) {
-            try {
-                Class.forName("com.mysql.cj.jdbc.Driver"); // MySQL JDBC 드라이버
-                String url = "jdbc:mysql://localhost:3306/jsp_project"; // 데이터베이스 URL
-                String user = "root"; // MySQL 사용자명
-                String password = "A@a01075396929"; // MySQL 비밀번호
+    static {
+        try {
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl("jdbc:mysql://localhost:3306/jsp_project?serverTimezone=Asia/Seoul?useSSL=false&serverTimezone=UTC");
+            config.setUsername("root");
+            config.setPassword("A@a01075396929");
+            config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
-                conn = DriverManager.getConnection(url, user, password);
-            } catch (ClassNotFoundException | SQLException e) {
-                e.printStackTrace();
-            }
+            // HikariCP 설정
+            config.setMaximumPoolSize(10);
+            config.setMinimumIdle(5);
+            config.setIdleTimeout(300000); // 5분
+            config.setMaxLifetime(1800000); // 30분
+            config.setConnectionTimeout(30000); // 30초
+
+            dataSource = new HikariDataSource(config);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("HikariCP DataSource initialization failed.");
         }
-        return conn;
     }
 
-    // 연결 종료 메서드
-    public static void closeConnection() {
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+    // Connection을 반환하는 메서드
+    public static Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
+
+    // DataSource 종료 메서드
+    public static void closeDataSource() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
         }
     }
 }
