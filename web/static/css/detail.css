@@ -50,6 +50,10 @@
 	width: 60%;
 }
 
+.hidden {
+	display: none;
+}
+
 /* 댓글 섹션 스타일 */
 .comment-box {
 	margin-top: 20px;

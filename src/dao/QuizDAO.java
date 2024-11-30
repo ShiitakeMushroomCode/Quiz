@@ -23,7 +23,6 @@ public class QuizDAO {
                     quiz.setQuizId(rs.getInt("quiz_id"));
                     quiz.setQuizName(rs.getString("quiz_name"));
                     quiz.setExp(rs.getString("exp"));
-                    quiz.setType(rs.getString("type"));
                     quiz.setOwnerId(rs.getInt("owner_id"));
                     quiz.setRelease(rs.getString("release"));
                     quiz.setCreatedAt(rs.getTimestamp("created_at"));
@@ -56,7 +55,6 @@ public class QuizDAO {
                     quiz.setQuizId(rs.getInt("quiz_id"));
                     quiz.setQuizName(rs.getString("quiz_name"));
                     quiz.setExp(rs.getString("exp"));
-                    quiz.setType(rs.getString("type"));
                     quiz.setOwnerId(rs.getInt("owner_id"));
                     quiz.setRelease(rs.getString("release"));
                     quiz.setCreatedAt(rs.getTimestamp("created_at"));

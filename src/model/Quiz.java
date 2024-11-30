@@ -7,7 +7,6 @@ public class Quiz {
     private String quizName;
     private int ownerId;
     private String exp;
-    private String type;
     private String release;
     private Timestamp createdAt;
     private Timestamp updatedAt;
@@ -46,14 +45,6 @@ public class Quiz {
 
     public void setExp(String exp) {
         this.exp = exp;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getRelease() {
