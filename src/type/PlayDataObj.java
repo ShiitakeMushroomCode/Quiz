@@ -1,7 +1,7 @@
 package type;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class PlayDataObj {
@@ -37,6 +37,14 @@ public class PlayDataObj {
     }
 
     public void setCorrectAnswer(String[] correctAnswer) {
-        this.correctAnswerSet = correctAnswer == null ? new HashSet<>() : new HashSet<>(Arrays.asList(correctAnswer));
+        this.correctAnswerSet = correctAnswer == null ? new LinkedHashSet<>() : new LinkedHashSet<>(Arrays.asList(correctAnswer));
+    }
+
+    // 정답 중 첫 번째 값을 반환하는 메서드 추가
+    public String getFirstCorrectAnswer() {
+        if (correctAnswerSet == null || correctAnswerSet.isEmpty()) {
+            return null;
+        }
+        return correctAnswerSet.iterator().next();
     }
 }
