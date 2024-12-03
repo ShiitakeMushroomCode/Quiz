@@ -1,202 +1,196 @@
 @charset "UTF-8";
 
-/* 레이아웃 테이블 스타일 */
+/* 전체 레이아웃 스타일 */
 .layout-table {
 	width: 1024px;
-	height: 780px;
-	margin: 0 auto 20px;
+	margin: 40px auto;
 	border-spacing: 20px;
 	background-color: #ffffff;
-	padding: 20px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	padding: 30px;
+	border-radius: 15px;
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+	animation: fadeIn 1.5s ease-in-out;
 }
 
-/* 그림 섹션 스타일 */
-.image-section {
-	width: 60%;
-	height: 400px;
-	border: 1px solid #3ca0e0;
+/* 제목 섹션 스타일 */
+.title-section {
 	text-align: center;
-	vertical-align: middle;
-	font-size: 24px;
+	margin-bottom: 20px;
+	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.title-section{
-	width: 1024px !important;
-	height: 50px;
-	padding: 0;
+.title-section h1 {
+	font-size: 2.5rem;
+	color: #333;
+	font-weight: bold;
+	text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.title-section h1{
-	width: 1024px !important;
-	padding: 0;
-	margin: 0;
+/* 이미지 섹션 스타일 */
+.image-section {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 400px;
+	border: 1px solid #d1e9ff;
+	background-color: #f0f8ff;
+	border-radius: 10px;
 	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+	box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.image-section img {
+	max-width: 100%;
+	max-height: 100%;
+	border-radius: 8px;
 }
 
 /* 설명 섹션 스타일 */
 .description-section {
-	width: 60%;
-	height: 200px;
-	border: 1px solid #3ca0e0;
-	text-align: left !important;
-	vertical-align: top !important;
-	font-size: 18px;
+	font-size: 1.2rem;
+	line-height: 1.6;
 	padding: 20px;
-}
-.buttons-section{
-	width: 60%;
-}
-
-.hidden {
-	display: none;
-}
-
-/* 댓글 섹션 스타일 */
-.comment-box {
-	margin-top: 20px;
-	width: 100%;
-	border: 1px solid #3ca0e0;
-	padding: 10px;
-	border-radius: 5px;
-	height: 700px;
-}
-
-.comment-box h2 {
-	text-align: center;
-	margin: 0 0 10px 0;
-}
-
-/* 댓글 입력 */
-.comment-input {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	margin-bottom: 20px;
-}
-
-.comment-input textarea {
-	width: 100%;
-	height: calc(1.2em * 3 + 16px);
-	padding: 8px;
-	resize: none;
-	overflow-y: auto;
-	border: none;
+	color: #555;
+	background-color: #fdfdfd;
+	border: 1px solid #ddd;
 	border-radius: 10px;
-	background-color: #f5f5f5;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	animation: fadeIn 1s ease;
 }
 
-.input-row {
+/* 버튼 섹션 스타일 */
+.buttons-section {
 	display: flex;
-	gap: 10px;
-	align-items: center;
-}
-
-.comment-input input[type="text"] {
-	padding: 8px;
-	border: 1px solid #cccccc;
-	border-radius: 20px;
-	width: 40%;
-}
-
-.comment-input input[type="password"] {
-	padding: 8px;
-	border: 1px solid #cccccc;
-	border-radius: 20px;
-	width: 40%;
-}
-
-.comment-input button {
-	padding: 8px 16px;
-	background-color: #3ca0e0;
-	color: white;
-	border: none;
-	cursor: pointer;
-	border-radius: 20px;
-	height: 100%;
-	width: 20%;
-	transition: background-color 0.3s, transform 0.2s;
-}
-
-.comment-input button:hover {
-	background-color: #2a82b8;
-}
-
-.comment-input button:active {
-	background-color: #1f6a94;
-	transform: scale(0.95);
-}
-
-
-.comment-list {
-	display: flex;
-	flex-direction: column;
+	justify-content: center;
 	gap: 15px;
-	height: 510px;
-	overflow-y: auto;
-	-ms-overflow-style: none;
-	scrollbar-width: none;
-}
-
-.comment-list::-webkit-scrollbar {
-	display: none;
-}
-
-.comment-item {
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-start;
-	padding: 10px;
-	border: 1px solid #e0e0e0;
-	border-radius: 5px;
-	background-color: #f9f9f9;
-}
-
-.delete-btn {
-	background: none;
-	border: none;
-	cursor: pointer;
-	font-size: 1rem;
-	margin-top: 5px;
-	padding: 5px;
-	border-radius: 50%;
-	transition: background-color 0.2s, transform 0.2s;
-}
-
-.delete-btn:hover {
-	background-color: rgba(255, 0, 0, 0.1);
-}
-
-.delete-btn:active {
-	background-color: rgba(255, 0, 0, 0.2);
-	transform: scale(0.95);
-}
-
-
-/* 버튼 스타일 */
-.footer-buttons {
-	display: flex;
-	justify-content: space-around;
-	margin-top: 20px;
+	padding-top: 20px;
 }
 
 .footer-buttons button {
-	padding: 10px 20px;
-	background-color: #3ca0e0;
-	color: #ffffff;
+	padding: 12px 24px;
+	font-size: 1rem;
+	background-color: #007bff;
+	color: white;
 	border: none;
-	border-radius: 5px;
+	border-radius: 8px;
 	cursor: pointer;
-	transition: background-color 0.3s ease, transform 0.2s ease;
+	box-shadow: 0 4px 6px rgba(0, 123, 255, 0.4);
+	transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
 }
 
 .footer-buttons button:hover {
-	background-color: #2a80b0;
+	background-color: #0056b3;
+	transform: translateY(-2px);
+	box-shadow: 0 8px 12px rgba(0, 123, 255, 0.5);
 }
 
 .footer-buttons button:active {
-	background-color: #1e5f84;
+	background-color: #003d80;
 	transform: scale(0.95);
+	box-shadow: 0 4px 6px rgba(0, 123, 255, 0.4);
+}
+
+/* 댓글 박스 스타일 */
+.comment-box {
+	margin-top: 20px;
+	background-color: #f7faff;
+	padding: 20px;
+	border-radius: 10px;
+	border: 1px solid #d1e9ff;
+	box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.05);
+	animation: fadeIn 1s ease;
+}
+
+.comment-box h2 {
+	font-size: 1.5rem;
+	color: #333;
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+/* 댓글 입력 스타일 */
+.comment-input textarea {
+	width: 100%;
+	height: 80px;
+	padding: 12px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	background-color: #f9f9f9;
+	resize: none;
+	font-size: 1rem;
+	transition: border-color 0.3s ease;
+}
+
+.comment-input textarea:focus {
+	border-color: #007bff;
+	background-color: #f0f8ff;
+	outline: none;
+}
+
+.comment-input button {
+	padding: 10px 20px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 1rem;
+	transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.comment-input button:hover {
+	background-color: #0056b3;
+}
+
+.comment-input button:active {
+	background-color: #003d80;
+	transform: scale(0.95);
+}
+
+/* 댓글 리스트 */
+.comment-list {
+	max-height: 510px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.comment-item {
+	background-color: #ffffff;
+	padding: 15px;
+	border-radius: 8px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	border-left: 4px solid #007bff;
+	transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.comment-item:hover {
+	transform: translateX(5px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.comment-item .delete-btn {
+	background: transparent;
+	border: none;
+	color: #ff4d4d;
+	cursor: pointer;
+	font-size: 1.2rem;
+	transition: color 0.3s ease;
+}
+
+.comment-item .delete-btn:hover {
+	color: #ff0000;
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }

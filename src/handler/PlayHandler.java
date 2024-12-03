@@ -3,6 +3,7 @@ package handler;
 import bean.PlayData;
 import com.google.gson.Gson;
 import dao.DetailQuizDAO;
+import dao.PlayDataDAO;
 import type.PlayDataObj;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,6 @@ public class PlayHandler implements Handler {
     public String handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
 
-        // AJAX 요청 처리
         String action = request.getParameter("action");
         if ("getQuestion".equals(action)) {
             return handleGetQuestion(request, response, session);
@@ -29,7 +29,6 @@ public class PlayHandler implements Handler {
             return handleSubmitAnswer(request, response, session);
         }
 
-        // 기본 초기화
         return initializeQuiz(request, session);
     }
 
@@ -66,21 +65,80 @@ public class PlayHandler implements Handler {
         boolean isCorrect = currentQuestion.isAnswerCorrect(userAnswer);
 
         if (isCorrect) {
-            session.setAttribute("score", score + 1);
+            score += 1;
+            session.setAttribute("score", score);
         }
 
-        session.setAttribute("currentIndex", currentIndex + 1);
+        currentIndex++;
+        session.setAttribute("currentIndex", currentIndex);
 
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("isCorrect", isCorrect);
-        responseData.put("correctAnswer", currentQuestion.getFirstCorrectAnswer()); // 정답 목록 중 첫 번째 정답 반환
+        responseData.put("correctAnswer", currentQuestion.getFirstCorrectAnswer());
         responseData.put("detailId", currentQuestion.getDetailId());
         responseData.put("imageId", currentQuestion.getImageId());
+
+        if (currentIndex >= playData.getItems().length) {
+            int totalQuestions = playData.getItems().length;
+            int correctAnswers = score; // 현재 점수가 정답 개수
+            float correctRatio = ((float) correctAnswers / totalQuestions) * 100;
+            correctRatio = Math.round(correctRatio * 100.0f) / 100.0f;
+
+            // PlayData 저장
+            model.PlayData playDataRecord = new model.PlayData();
+            playDataRecord.setQuizId(playData.getQuizId());
+            playDataRecord.setCorrectPercent(correctRatio);
+
+            PlayDataDAO dao = new PlayDataDAO();
+            boolean isSaved = dao.savePlayData(playDataRecord);
+
+            if (!isSaved) {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "퀴즈 데이터를 저장하는 도중 오류가 발생했습니다.");
+                return null;
+            }
+
+            // 상위 퍼센트 계산
+            List<Float> allRatios = dao.getAllCorrectRatios(playData.getQuizId());
+            allRatios.add(correctRatio);
+            allRatios.sort(Float::compareTo);
+
+            int totalPlayers = allRatios.size();
+            int betterScores = 0;
+
+            for (Float ratio : allRatios) {
+                if (correctRatio < ratio) {
+                    betterScores++;
+                }
+            }
+
+            int percentile;
+            if (correctAnswers == totalQuestions) {
+                percentile = 1; // 정답 개수와 문제 개수가 같으면 상위 1%
+            } else {
+                percentile = (int) Math.ceil(((float) betterScores / totalPlayers) * 100); // 소수점 없이 올림
+            }
+
+            // 세션에 결과 저장
+            session.setAttribute(
+                    "quizResult", Map.of(
+                    "correctRatio", Math.round(correctRatio), // 소수점 없이 정수로 저장
+                    "percentile", percentile,
+                    "totalPlayers", totalPlayers,
+                    "quizId", playData.getQuizId(),
+                    "totalQuestions", totalQuestions,
+                    "correctAnswers", correctAnswers
+            ));
+
+        responseData.put("status", "end");
+        } else {
+            responseData.put("status", "continue");
+        }
+
+
 
         sendJsonResponse(response, responseData);
         return null;
     }
-
 
     private String initializeQuiz(HttpServletRequest request, HttpSession session) {
         String idParam = request.getParameter("id");
@@ -94,23 +152,19 @@ public class PlayHandler implements Handler {
         int quizId = Integer.parseInt(idParam);
         int count = Integer.parseInt(countParam);
 
-        // 퀴즈 데이터 초기화
         PlayData playData = new PlayData();
         playData.setQuizId(quizId);
         playData.setCount(count);
 
-        // DAO에서 데이터 가져오기
         List<PlayDataObj> details = new DetailQuizDAO().getDetailsByQuizId(quizId, count);
         playData.setItems(details.toArray(new PlayDataObj[0]));
 
-        // 세션에 초기화된 데이터 설정
         session.setAttribute("playData", playData);
         session.setAttribute("currentIndex", 0);
         session.setAttribute("score", 0);
+        session.setAttribute("quizId", quizId);
 
-        // quizId 전달
         request.setAttribute("quizId", quizId);
-
         request.setAttribute("currentQuestion", playData.getItems()[0]);
         return "/views/quizPlay";
     }
