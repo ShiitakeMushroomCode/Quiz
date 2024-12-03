@@ -11,7 +11,7 @@ public class LoginHandler implements Handler {
 
     @Override
     public String handleRequest(HttpServletRequest request, HttpServletResponse response) {
-        return "/views/login";
+          return "/views/login";
     }
 
 }

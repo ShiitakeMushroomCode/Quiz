@@ -19,13 +19,20 @@
         </td>
     </tr>
     <tr>
+        <%
+            request.setAttribute("quizId", detailData.getId());
+            request.setAttribute("redirectUrl",  request.getContextPath() + "/views/detail?id=" + detailData.getId());
+        %>
         <td>
-            <%@ include file="/WEB-INF/components/commentBox/commentBox.jsp" %>
+            <td rowspan="5">
+                <%@ include file="/WEB-INF/components/commentBox/commentBox.jsp" %>
+            </td>
         </td>
     </tr>
     <tr>
         <td class="image-section">
-            <img src="${pageContext.request.contextPath}/static/images/${detailData.id}/Thumbnail.WebP" alt="썸네일">
+            <img src="${pageContext.request.contextPath}/static/images/${detailData.id}/Thumbnail.WebP" alt="썸네일"
+                 onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/static/images/etc/empty.WebP';" />
         </td>
     </tr>
     <tr>
@@ -192,6 +199,13 @@
             xhr.send('commentId=' + encodeURIComponent(commentId) + '&password=' + encodeURIComponent(password));
         }
     }
+    window.addEventListener('load', () => {
+        const currentUrl = location.href; // 현재 URL 가져오기
+
+        // 현재 URL로 히스토리 덮어쓰기
+        history.replaceState(null, null, currentUrl);
+    });
+
 </script>
 </body>
 </html>

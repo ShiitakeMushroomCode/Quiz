@@ -1,5 +1,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%
+    response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+%>
 <html>
 <head>
     <title>퀴즈</title>
@@ -47,10 +52,11 @@
 
     function setImageWithFallback(imageUrl) {
         const questionImage = document.getElementById("questionImage");
+        const contextPath = '<%= request.getContextPath() %>';
         questionImage.src = imageUrl;
         questionImage.onerror = () => {
             questionImage.onerror = null;
-            questionImage.src = "https://via.placeholder.com/300x200";
+            questionImage.src = contextPath + '/static/images/etc/empty.WebP';
         };
     }
     async function submitAnswer() {

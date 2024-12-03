@@ -30,9 +30,14 @@ public class AddCommentHandler implements Handler {
 
             if (isSuccess) {
                 // 댓글 추가 성공 시, 원래 페이지로 리다이렉트
-                response.sendRedirect("detail?id=" + quizId);
+                String redirectUrl = request.getParameter("redirectUrl");
+                if (redirectUrl == null || redirectUrl.isEmpty()) {
+                    redirectUrl = "detail?id=" + quizId;
+                }
+                response.sendRedirect(redirectUrl);
                 return null;
-            } else {
+            }
+            else {
                 request.setAttribute("errorMessage", "댓글 작성에 실패했습니다.");
                 return "/views/error";
             }

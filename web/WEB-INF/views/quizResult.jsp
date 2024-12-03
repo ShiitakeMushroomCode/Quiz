@@ -1,3 +1,4 @@
+<%@ page import="java.util.Map" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <html>
@@ -13,7 +14,8 @@
     <!-- 왼쪽 결과 섹션 -->
     <div class="result-left">
         <div class="result-image">
-            <img src="${pageContext.request.contextPath}/static/images/${quizResult.quizId}/Thumbnail.WebP" alt="썸네일">
+            <img src="${pageContext.request.contextPath}/static/images/${quizResult.quizId}/Thumbnail.WebP" alt="썸네일"
+                 onerror="this.onerror=null; this.src='<%= request.getContextPath() %>/static/images/etc/empty.WebP';">
         </div>
         <h2 class="correct-count">
             ${quizResult.correctAnswers}개 맞히셨습니다
@@ -30,6 +32,13 @@
     </div>
 
     <!-- 오른쪽 댓글 섹션 -->
+    <%
+        Map<String, Object> quizResult = (Map<String, Object>) request.getAttribute("quizResult");
+        Integer quizId = quizResult != null ? (Integer) quizResult.get("quizId") : null;
+        request.setAttribute("quizId", quizId);
+        request.setAttribute("redirectUrl",  request.getContextPath() + "/views/quizResult");
+        request.setAttribute("quizResult", quizResult);
+    %>
     <div class="result-right">
         <%@ include file="/WEB-INF/components/commentBox/commentBox.jsp" %>
     </div>
@@ -71,13 +80,14 @@
         const contextPath = '<%= request.getContextPath() %>';
         window.location.href = contextPath+`/views/index`;
     }
+
     // 댓글 삭제
     function deleteComment(commentId) {
         const password = prompt("비밀번호를 입력하세요:");
         if (!password) return;
 
         const contextPath = '<%= request.getContextPath() %>';
-        fetch(`${contextPath}/views/deleteComment`, {
+        fetch(contextPath +`/views/deleteComment`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `commentId=`+encodeURIComponent(commentId)+`&password=`+encodeURIComponent(password)
@@ -159,6 +169,20 @@
             setTimeout(() => {
                 barGraph.style.setProperty('--bar-width', rP+`%`);
             }, 100);
+        }
+    });
+
+
+    // 새로고침 상태 관리
+    window.addEventListener("load", () => {
+        const contextPath = '<%= request.getContextPath() %>';
+
+        // 새로고침 상태 확인
+        if (performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+            // 새로고침일 경우 리다이렉트
+            if (quizResult.quizId) {
+                window.location.href = contextPath + '/views/detail?id=' + quizResult.quizId;
+            }
         }
     });
 

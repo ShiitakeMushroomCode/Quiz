@@ -35,7 +35,7 @@
         %>
         <div class="quiz-item" onclick="location.href='detail?id=<%=quiz.getQuizId()%>'">
             <img src="<%= imageSrc %>" alt="Quiz Image"
-                 onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200';">
+                 onerror="this.onerror=null; this.src='<%= request.getContextPath() %>/static/images/etc/empty.WebP';">
             <h3><%= quiz.getQuizName() %>
             </h3>
             <p><%= quiz.getExp() %>

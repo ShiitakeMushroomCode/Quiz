@@ -3,6 +3,7 @@
   <component name="WebContextManager">
     <option name="state">
       <map>
+        <entry key="file://$PROJECT_DIR$/web/WEB-INF/components/commentBox/commentInput.jsp" value="file://$PROJECT_DIR$/web/WEB-INF/components/commentBox" />
         <entry key="file://$PROJECT_DIR$/web/WEB-INF/views/detail.jsp" value="file://$PROJECT_DIR$/web/WEB-INF/views" />
         <entry key="file://$PROJECT_DIR$/web/WEB-INF/views/index.jsp" value="file://$PROJECT_DIR$/web/WEB-INF/views" />
         <entry key="file://$PROJECT_DIR$/web/WEB-INF/views/login.jsp" value="file://$PROJECT_DIR$/web/WEB-INF/views" />
