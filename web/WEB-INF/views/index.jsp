@@ -19,15 +19,22 @@
     <!-- 퀴즈 목록 -->
     <div class="quizzes">
         <%
+            String searchValue = request.getParameter("searchInput");
+            String filter = request.getParameter("filter");
+
+            if (filter == null || filter.isEmpty()) {
+                filter = "popular";
+            }
+
             int offset = 0;
             int size = 12;
 
             // QuizDAO를 통해 데이터 가져오기
             dao.QuizDAO quizDAO = new dao.QuizDAO();
-            List<model.Quiz> quizzes = quizDAO.getQuizzesByOffset(offset, size);
+            List<model.Quiz> quizzes = quizDAO.getQuizzesByOffsetAndSearch(offset, size, searchValue, filter);
 
             // 총 퀴즈 수 가져오기
-            int totalQuizzes = quizDAO.getTotalQuizCount();
+            int totalQuizzes = quizDAO.getTotalQuizCount(searchValue);
 
             // 데이터를 출력
             for (Quiz quiz : quizzes) {
@@ -48,10 +55,14 @@
 </div>
 
 <script>
-    let totalLoaded = <%= size %>; // 처음 로드된 항목 수
+    let totalLoaded = <%= quizzes.size() %>; // 처음 로드된 항목 수
     const itemsToLoadNext = 24; // 다음에 로드할 항목 수
     let isLoading = false; // 데이터 로드 중인지 여부
     const totalQuizzes = <%= totalQuizzes %>; // 총 퀴즈 수
+
+    // 검색 값과 필터 값을 JavaScript 변수로 저장
+    let searchValue = '<%= searchValue != null ? searchValue : "" %>';
+    let filter = '<%= filter %>';
 
     // 스크롤 이벤트 핸들러
     function onScrollLoad() {
@@ -67,14 +78,13 @@
         }
     }
 
-    // 스크롤 이벤트에 디바운스 적용 (선택 사항)
     function debounce(func, delay) {
-        let debounceTimer;
-        return function () {
-            const context = this;
-            const args = arguments;
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => func.apply(context, args), delay);
+        let timeoutId;
+        return function (...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
         };
     }
 
@@ -90,7 +100,7 @@
 
         isLoading = true; // 로딩 시작
         const currentOffset = totalLoaded;
-        const url = '<%= request.getContextPath() %>/views/loadMoreQuizzes?offset=' + currentOffset + '&size=' + itemsToLoadNext;
+        const url = '<%= request.getContextPath() %>/views/loadMoreQuizzes?offset=' + currentOffset + '&size=' + itemsToLoadNext + '&searchInput=' + encodeURIComponent(searchValue) + '&filter=' + encodeURIComponent(filter);
 
         fetch(url, {
             method: 'GET',

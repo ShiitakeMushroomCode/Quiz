@@ -13,6 +13,12 @@ public class MoreQuizzesHandler implements Handler {
         try {
             int offset = 0;
             int size = 24;
+            String searchValue = request.getParameter("searchInput");
+            String filter = request.getParameter("filter");
+
+            if (filter == null || filter.isEmpty()) {
+                filter = "popular";
+            }
 
             if (request.getParameter("offset") != null) {
                 offset = Integer.parseInt(request.getParameter("offset"));
@@ -23,7 +29,7 @@ public class MoreQuizzesHandler implements Handler {
 
             // QuizDAO를 통해 데이터 가져오기
             QuizDAO quizDAO = new QuizDAO();
-            List<Quiz> quizzes = quizDAO.getQuizzesByOffset(offset, size);
+            List<Quiz> quizzes = quizDAO.getQuizzesByOffsetAndSearch(offset, size, searchValue, filter);
 
             if (quizzes.isEmpty()) {
                 // 더 이상 로드할 퀴즈가 없음

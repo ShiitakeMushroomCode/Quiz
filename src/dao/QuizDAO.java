@@ -69,15 +69,86 @@ public class QuizDAO {
         return quizzes;
     }
 
-    public int getTotalQuizCount() {
-        int totalQuizzes = 0;
-        String query = "SELECT COUNT(*) FROM quiz";
+    public List<Quiz> getQuizzesByOffsetAndSearch(int offset, int size, String searchValue, String filter) {
+        List<Quiz> quizzes = new ArrayList<>();
+
+        StringBuilder queryBuilder = new StringBuilder("SELECT * FROM quiz");
+        List<Object> params = new ArrayList<>();
+
+        if (searchValue != null && !searchValue.isEmpty()) {
+            queryBuilder.append(" WHERE quiz_name LIKE ?");
+            params.add("%" + searchValue + "%");
+        }
+
+        if ("recent".equalsIgnoreCase(filter)) {
+            queryBuilder.append(" ORDER BY created_at DESC");
+        } else if ("popular".equalsIgnoreCase(filter)) {
+            // 인기순 정렬 (play_data에서 퀴즈별 플레이 수 기준 내림차순)
+            // 같은 인기 순위에서는 created_at 기준 오름차순 (오래된 것부터)
+            queryBuilder.append(" ORDER BY (SELECT COUNT(*) FROM play_data WHERE play_data.quiz_id = quiz.quiz_id) DESC, created_at ASC");
+        }
+
+        queryBuilder.append(" LIMIT ? OFFSET ?");
+        params.add(size);
+        params.add(offset);
+
+        String query = queryBuilder.toString();
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                totalQuizzes = rs.getInt(1);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            for (int i = 0; i < params.size(); i++) {
+                Object param = params.get(i);
+                if (param instanceof Integer) {
+                    stmt.setInt(i + 1, (Integer) param);
+                } else if (param instanceof String) {
+                    stmt.setString(i + 1, (String) param);
+                }
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Quiz quiz = new Quiz();
+                    quiz.setQuizId(rs.getInt("quiz_id"));
+                    quiz.setQuizName(rs.getString("quiz_name"));
+                    quiz.setExp(rs.getString("exp"));
+                    quiz.setOwnerId(rs.getInt("owner_id"));
+                    quiz.setRelease(rs.getString("release"));
+                    quiz.setCreatedAt(rs.getTimestamp("created_at"));
+                    quiz.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    quizzes.add(quiz);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return quizzes;
+    }
+
+    public int getTotalQuizCount(String searchValue) {
+        int totalQuizzes = 0;
+        StringBuilder queryBuilder = new StringBuilder("SELECT COUNT(*) FROM quiz");
+        List<Object> params = new ArrayList<>();
+
+        if (searchValue != null && !searchValue.isEmpty()) {
+            queryBuilder.append(" WHERE quiz_name LIKE ?");
+            params.add("%" + searchValue + "%");
+        }
+
+        String query = queryBuilder.toString();
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setString(i + 1, (String) params.get(i));
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    totalQuizzes = rs.getInt(1);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
