@@ -18,6 +18,11 @@
 <div class="container">
     <!-- 퀴즈 목록 -->
     <div class="quizzes">
+        <div class="quiz-item" onclick="">
+            <img src="<%= request.getContextPath() %>/static/images/etc/add.WebP" alt="비어있는 이미지">
+            <h3>새로운 퀴즈를 만들어보세요!</h3>
+            <p>나만의 문제를 만들어보세요.</p>
+        </div>
         <%
             String searchValue = request.getParameter("searchInput");
             String filter = request.getParameter("filter");
