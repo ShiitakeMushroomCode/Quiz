@@ -1,15 +1,17 @@
 package handler;
 
+import bean.DetailData;
 import dao.QuizDAO;
 import dao.UserDAO;
 import model.Quiz;
 import model.User;
 
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
 
-public class MyQuizHandler implements Handler {
+public class QuizEditHandler implements Handler {
     @Override
     public String handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession(false);
@@ -26,29 +28,27 @@ public class MyQuizHandler implements Handler {
         UserDAO userDAO = new UserDAO();
         int userId = userDAO.findByKakaoId(kakaoId).getId();
 
-        // 파라미터 값 가져오기
-        String searchValue = request.getParameter("searchInput");
-        String filter = request.getParameter("filter");
 
-        if (filter == null || filter.isEmpty()) {
-            filter = "popular";
+        String idParam = request.getParameter("id");
+        if (idParam == null || idParam.isEmpty()) {
+            return "/views/notFound"; // id가 없는 경우 처리
         }
 
-        int offset = 0;
-        int size = 12;
+        int id;
+        try {
+            id = Integer.parseInt(idParam);
+        } catch (NumberFormatException e) {
+            return "/views/notFound"; // id가 유효한 숫자가 아닌 경우 처리
+        }
 
-        // QuizDAO를 통해 데이터 가져오기
+        // DAO를 사용하여 데이터베이스에서 Quiz 객체 가져오기
         QuizDAO quizDAO = new QuizDAO();
-        List<Quiz> quizzes = quizDAO.getQuizzesByOwnerIdAndOffset(userId, offset, size, searchValue, filter);
+        Quiz quiz = quizDAO.getQuizById(id);
 
-        // 총 퀴즈 수 가져오기
-        int totalQuizzes = quizDAO.getTotalQuizCountByOwnerId(userId, searchValue);
+        if (quiz == null) {
+            return "/views/notFound"; // 해당 id의 퀴즈가 없는 경우 처리
+        }
 
-        // 데이터를 요청 객체에 저장
-        request.setAttribute("quizzes", quizzes);
-        request.setAttribute("totalQuizzes", totalQuizzes);
-
-        // 마이퀴즈 페이지로 이동
-        return "/views/myquiz";
+        return "/views/editQuiz"; // 정상적으로 처리된 경우
     }
 }
