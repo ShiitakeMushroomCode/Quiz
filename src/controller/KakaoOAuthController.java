@@ -20,6 +20,11 @@ public class KakaoOAuthController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+        response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+        response.setDateHeader("Expires", 0); // Proxies.
+
         String code = request.getParameter("code");
 
         // 로그인 버튼 클릭 시 카카오 인증 페이지로 리다이렉트

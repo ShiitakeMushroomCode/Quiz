@@ -1,6 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="model.User" %>
-
+<%
+    response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+%>
 <header>
     <div class="container">
         <img src="${pageContext.request.contextPath}/static/icons/favicon.ico"
@@ -19,7 +23,7 @@
                 퀴즈
             </button>
             <button
-                    onclick="location.href='<%=request.getContextPath()%>/logout'">로그아웃
+                    onclick="location.href='<%=request.getContextPath()%>/views/logout'">로그아웃
             </button>
             <%
             } else {

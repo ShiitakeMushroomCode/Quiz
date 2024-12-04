@@ -4,10 +4,12 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Insert title here</title>
+    <title>마이 퀴즈</title>
     <link rel="icon" href="<%= request.getContextPath() %>/static/icons/favicon.ico">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/styles.css">
 </head>
 <body>
+<%@ include file="/WEB-INF/components/header.jsp" %>
 
 </body>
 </html>

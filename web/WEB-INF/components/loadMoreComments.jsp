@@ -1,23 +1,21 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="java.util.List" %>
-<%@ page import="model.Comment" %>
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<%
-    List<Comment> comments = (List<Comment>) request.getAttribute("comments");
-
-    if (comments == null || comments.isEmpty()) {
-        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-        return;
-    }
-
-    for (Comment comment : comments) {
-%>
-<div class="comment-item">
-    <p><strong><%= comment.getWriter() %></strong> (<%= comment.getCreatedAt() %>)<br>
-        <%= comment.getComment() %>
-    </p>
-    <button class="delete-btn" onclick="deleteComment('<%= comment.getCommentId() %>')">❌</button>
-</div>
-<%
-    }
-%>
+<c:choose>
+    <c:when test="${empty comments}">
+        <c:set var="status" value="${pageContext.response}" />
+        <c:set target="${status}" property="status" value="204" />
+    </c:when>
+    <c:otherwise>
+        <c:forEach var="comment" items="${comments}">
+            <div class="comment-item">
+                <p>
+                    <strong>${comment.writer}</strong> (${comment.createdAt})<br>
+                        ${comment.comment}
+                </p>
+                <button class="delete-btn" onclick="deleteComment('${comment.commentId}')">❌</button>
+            </div>
+        </c:forEach>
+    </c:otherwise>
+</c:choose>
