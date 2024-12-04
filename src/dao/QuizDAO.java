@@ -11,7 +11,7 @@ public class QuizDAO {
 
     public Quiz getQuizById(int id) {
         Quiz quiz = null;
-        String query = "SELECT * FROM quiz WHERE quiz_id = ?";
+        String query = "SELECT * FROM quiz WHERE quiz_id = ? and `release` = 'Y'";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -42,7 +42,7 @@ public class QuizDAO {
 
     public List<Quiz> getQuizzesByOffset(int offset, int size) {
         List<Quiz> quizzes = new ArrayList<>();
-        String query = "SELECT * FROM quiz LIMIT ? OFFSET ?";
+        String query = "SELECT * FROM quiz WHERE `release` = 'Y' LIMIT ? OFFSET ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -72,19 +72,17 @@ public class QuizDAO {
     public List<Quiz> getQuizzesByOffsetAndSearch(int offset, int size, String searchValue, String filter) {
         List<Quiz> quizzes = new ArrayList<>();
 
-        StringBuilder queryBuilder = new StringBuilder("SELECT * FROM quiz");
+        StringBuilder queryBuilder = new StringBuilder("SELECT * FROM quiz WHERE `release` = 'Y'");
         List<Object> params = new ArrayList<>();
 
         if (searchValue != null && !searchValue.isEmpty()) {
-            queryBuilder.append(" WHERE quiz_name LIKE ?");
+            queryBuilder.append(" AND quiz_name LIKE ?");
             params.add("%" + searchValue + "%");
         }
 
         if ("recent".equalsIgnoreCase(filter)) {
             queryBuilder.append(" ORDER BY created_at DESC");
         } else if ("popular".equalsIgnoreCase(filter)) {
-            // 인기순 정렬 (play_data에서 퀴즈별 플레이 수 기준 내림차순)
-            // 같은 인기 순위에서는 created_at 기준 오름차순 (오래된 것부터)
             queryBuilder.append(" ORDER BY (SELECT COUNT(*) FROM play_data WHERE play_data.quiz_id = quiz.quiz_id) DESC, created_at ASC");
         }
 
@@ -128,11 +126,11 @@ public class QuizDAO {
 
     public int getTotalQuizCount(String searchValue) {
         int totalQuizzes = 0;
-        StringBuilder queryBuilder = new StringBuilder("SELECT COUNT(*) FROM quiz");
+        StringBuilder queryBuilder = new StringBuilder("SELECT COUNT(*) FROM quiz WHERE `release` = 'Y'");
         List<Object> params = new ArrayList<>();
 
         if (searchValue != null && !searchValue.isEmpty()) {
-            queryBuilder.append(" WHERE quiz_name LIKE ?");
+            queryBuilder.append(" AND quiz_name LIKE ?");
             params.add("%" + searchValue + "%");
         }
 
