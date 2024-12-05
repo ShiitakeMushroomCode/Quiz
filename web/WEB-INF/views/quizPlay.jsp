@@ -42,7 +42,7 @@
             } else {
                 const detailId = data.detailId;
                 const imageId = data.imageId;
-                const imageUrl = contextPath + '/static/images/' + detailId + '/' + imageId + '/Quiz.WebP';
+                const imageUrl = contextPath + '/images/' + detailId + '/' + imageId + '.Q';
                 setImageWithFallback(imageUrl);
             }
         } catch (error) {
@@ -59,6 +59,7 @@
             questionImage.src = contextPath + '/static/images/etc/empty.WebP';
         };
     }
+
     async function submitAnswer() {
         try {
             const answer = document.getElementById("answer").value.trim(); // 입력값 공백 제거
@@ -83,6 +84,11 @@
             const correctAnswer = document.getElementById("correctAnswer");
             const quizForm = document.getElementById("quizForm");
             const nextButton = document.getElementById("nextButton");
+
+            const detailId = data.detailId;
+            const imageId = data.imageId;
+            const imageUrl = contextPath + '/images/' + detailId + '/' + imageId + '.C';
+            setImageWithFallback(imageUrl);
 
             // 결과 업데이트
             feedbackMessage.textContent = data.isCorrect ? "정답!" : "오답!";

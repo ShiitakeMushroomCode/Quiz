@@ -10,6 +10,17 @@ public class DetailData implements Serializable {
     private String n3;
     private String n4;
     private String exp;
+    private String release;
+
+    public String getRelease() {
+        return release;
+    }
+
+    public void setRelease(String release) {
+        if(release != null && !release.isEmpty() && (release.equals("Y") || release.equals("N"))) {
+            this.release = release;
+        }
+    }
 
     public String getTitle() {
         return title;

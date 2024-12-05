@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="model.Quiz" %>
+<%@ page import="util.FileSystem" %>
 
 <%
     List<Quiz> quizzes = (List<Quiz>) request.getAttribute("quizzes");
@@ -21,7 +22,7 @@
 
     for (Quiz quiz : quizzes) {
         String onclickUrl = onclickUrlPrefix + quiz.getQuizId();
-        String imageSrc = request.getContextPath() + "/static/images/" + quiz.getQuizId() + "/Thumbnail.WebP";
+        String imageSrc = request.getContextPath() + "/images/" + quiz.getQuizId() + ".T";
 %>
 <div class="quiz-item" onclick="location.href='<%= onclickUrl %>'">
     <img src="<%= imageSrc %>" alt="Quiz Image"

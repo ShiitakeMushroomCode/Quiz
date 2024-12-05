@@ -9,6 +9,32 @@ import java.util.List;
 
 public class QuizDAO {
 
+    public int insertQuiz(Quiz quiz) throws SQLException {
+        String query = "INSERT INTO quiz (quiz_name, exp, owner_id, `release`) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setString(1, quiz.getQuizName());
+            stmt.setString(2, quiz.getExp());
+            stmt.setInt(3, quiz.getOwnerId());
+            stmt.setString(4, quiz.getRelease());
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("퀴즈 생성 실패: 저장된 행이 없습니다.");
+            }
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int quizId = generatedKeys.getInt(1);
+                    return quizId;
+                } else {
+                    throw new SQLException("퀴즈 생성 실패: 생성된 ID가 없습니다.");
+                }
+            }
+        }
+    }
+
     public Quiz getQuizById(int id) {
         Quiz quiz = null;
         String query = "SELECT * FROM quiz WHERE quiz_id = ? and `release` = 'Y'";
@@ -16,6 +42,39 @@ public class QuizDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    quiz = new Quiz();
+                    quiz.setQuizId(rs.getInt("quiz_id"));
+                    quiz.setQuizName(rs.getString("quiz_name"));
+                    quiz.setExp(rs.getString("exp"));
+                    quiz.setOwnerId(rs.getInt("owner_id"));
+                    quiz.setRelease(rs.getString("release"));
+                    quiz.setCreatedAt(rs.getTimestamp("created_at"));
+                    quiz.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    quiz.setN1(rs.getShort("n1"));
+                    quiz.setN2(rs.getShort("n2"));
+                    quiz.setN3(rs.getShort("n3"));
+                    quiz.setN4(rs.getShort("n4"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return quiz;
+    }
+
+
+    public Quiz getQuizByIdAndOwner(int id, int ownerId) {
+        Quiz quiz = null;
+        String query = "SELECT * FROM quiz WHERE quiz_id = ? and owner_id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            stmt.setInt(2, ownerId);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -157,7 +216,7 @@ public class QuizDAO {
     public List<Quiz> getQuizzesByOwnerIdAndOffset(int ownerId, int offset, int size, String searchValue, String filter) {
         List<Quiz> quizzes = new ArrayList<>();
 
-        StringBuilder queryBuilder = new StringBuilder("SELECT * FROM quiz WHERE owner_id = ? AND `release` = 'Y'");
+        StringBuilder queryBuilder = new StringBuilder("SELECT * FROM quiz WHERE owner_id = ?");
         List<Object> params = new ArrayList<>();
         params.add(ownerId);
 

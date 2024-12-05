@@ -14,7 +14,7 @@
     <!-- 왼쪽 결과 섹션 -->
     <div class="result-left">
         <div class="result-image">
-            <img src="${pageContext.request.contextPath}/static/images/${quizResult.quizId}/Thumbnail.WebP" alt="썸네일"
+            <img src="${pageContext.request.contextPath}/images/${quizResult.quizId}.T" alt="썸네일"
                  onerror="this.onerror=null; this.src='<%= request.getContextPath() %>/static/images/etc/empty.WebP';">
         </div>
         <h2 class="correct-count">

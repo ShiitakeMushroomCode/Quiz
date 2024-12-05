@@ -36,14 +36,14 @@ body {
 }
 
 .quiz-item img {
-    width: 100%;
-    height: auto;
-    min-height: 200px;
-    max-height: 200px;
-    object-fit: cover;
-    border-bottom: 1px solid #ddd;
-    display: block;
-    margin: 0 auto;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 200px !important;
+    max-height: 200px !important;
+    object-fit: cover !important;
+    border-bottom: 1px solid #ddd !important;
+    display: block !important;
+    margin: 0 auto !important;
 }
 
 

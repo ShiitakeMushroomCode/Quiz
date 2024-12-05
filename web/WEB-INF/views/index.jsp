@@ -38,7 +38,7 @@
 
             // 데이터를 출력
             for (Quiz quiz : quizzes) {
-                String imageSrc = request.getContextPath() + "/static/images/" + quiz.getQuizId() + "/Thumbnail.WebP";
+                String imageSrc = request.getContextPath() + "/images/" + quiz.getQuizId() + ".T";
         %>
         <div class="quiz-item" onclick="location.href='detail?id=<%=quiz.getQuizId()%>'">
             <img src="<%= imageSrc %>" alt="Quiz Image"

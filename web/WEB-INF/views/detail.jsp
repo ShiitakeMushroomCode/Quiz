@@ -31,7 +31,7 @@
     </tr>
     <tr>
         <td class="image-section">
-            <img src="${pageContext.request.contextPath}/static/images/${detailData.id}/Thumbnail.WebP" alt="썸네일"
+            <img src="${pageContext.request.contextPath}/images/${detailData.id}.T" alt="썸네일"
                  onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/static/images/etc/empty.WebP';" />
         </td>
     </tr>
