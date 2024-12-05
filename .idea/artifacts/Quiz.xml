@@ -1,13 +1,13 @@
 <component name="ArtifactManager">
-  <artifact type="exploded-war" build-on-make="true" name="Quiz Project">
-    <output-path>$PROJECT_DIR$/out/artifacts/Quiz_Project</output-path>
-    <root id="root">
-      <element id="javaee-facet-resources" facet="Quiz/web/Web" />
+  <artifact type="war" build-on-make="true" name="Quiz">
+    <output-path>$PROJECT_DIR$/out/artifacts/Quiz</output-path>
+    <root id="archive" name="Quiz.war">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
           <element id="module-output" name="Quiz" />
         </element>
       </element>
+      <element id="javaee-facet-resources" facet="Quiz/web/Web" />
     </root>
   </artifact>
 </component>

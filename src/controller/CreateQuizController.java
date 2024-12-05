@@ -14,6 +14,10 @@ import java.sql.SQLException;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
+// WebP 지원 라이브러리 추가 필요
+import com.luciad.imageio.webp.WebPImageReaderSpi;
+import com.luciad.imageio.webp.WebPImageWriterSpi;
+
 @WebServlet("/createQuiz")
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024 * 2, // 2MB
@@ -21,6 +25,13 @@ import javax.imageio.ImageIO;
         maxRequestSize = 1024 * 1024 * 50    // 50MB
 )
 public class CreateQuizController extends HttpServlet {
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        // WebP 플러그인 등록
+        ImageIO.scanForPlugins();
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -53,27 +64,16 @@ public class CreateQuizController extends HttpServlet {
         // 파라미터 가져오기
         String quizName = request.getParameter("quizName");
         String exp = request.getParameter("exp");
-        String release = request.getParameter("release");
-
-        System.out.println("quizName: " + quizName);
-        System.out.println("exp: " + exp);
-        System.out.println("release: " + release);
 
         // 문자열 공백 제거
         quizName = quizName != null ? quizName.trim() : "";
         exp = exp != null ? exp.trim() : "";
-        release = release != null ? release.trim() : "";
 
         // 빈 값 체크
         if (quizName.isEmpty() || exp.isEmpty()) {
             request.setAttribute("errorMessage", "퀴즈 제목과 설명은 필수입니다.");
             request.getRequestDispatcher("/views/error.jsp").forward(request, response);
             return;
-        }
-
-        if (release.isEmpty()) {
-            // release 값이 없으면 기본값 'N' 설정
-            release = "N";
         }
 
         // 썸네일 이미지 파일 가져오기
@@ -97,7 +97,6 @@ public class CreateQuizController extends HttpServlet {
         Quiz quiz = new Quiz();
         quiz.setQuizName(quizName);
         quiz.setExp(exp);
-        quiz.setRelease(release);
         quiz.setOwnerId(userId);
 
         // 퀴즈 저장

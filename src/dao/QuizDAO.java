@@ -8,16 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuizDAO {
-
     public int insertQuiz(Quiz quiz) throws SQLException {
-        String query = "INSERT INTO quiz (quiz_name, exp, owner_id, `release`) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO quiz (quiz_name, exp, owner_id) VALUES (?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, quiz.getQuizName());
             stmt.setString(2, quiz.getExp());
             stmt.setInt(3, quiz.getOwnerId());
-            stmt.setString(4, quiz.getRelease());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -34,6 +32,7 @@ public class QuizDAO {
             }
         }
     }
+
 
     public Quiz getQuizById(int id) {
         Quiz quiz = null;

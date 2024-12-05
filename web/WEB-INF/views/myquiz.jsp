@@ -125,16 +125,6 @@
                         <label for="quizDescription">설명</label>
                         <textarea class="form-control" id="quizDescription" name="exp" rows="4" required></textarea>
                     </div>
-                    <!-- 공개여부 -->
-                    <div class="form-group">
-                        <label for="quizRelease">공개 여부</label>
-                        <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="quizRelease" name="releaseSwitch" onclick="toggleRelease()" value="Y">
-                            <label class="custom-control-label" for="quizRelease">공개</label>
-                        </div>
-                        <!-- 실제로 전송할 release 값을 위한 hidden input -->
-                        <input type="hidden" id="release" name="release" value="N">
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
@@ -262,22 +252,6 @@
                 alert('데이터를 로드하는 중 오류가 발생했습니다.');
             });
     }
-
-    // release 스위치의 상태에 따라 hidden input의 값을 설정하는 함수
-    function toggleRelease() {
-        const releaseCheckbox = document.getElementById('quizRelease');
-        const releaseHidden = document.getElementById('release');
-        if (releaseCheckbox.checked) {
-            releaseHidden.value = 'Y';
-        } else {
-            releaseHidden.value = 'N';
-        }
-    }
-
-    // 폼 제출 시 현재 체크 상태를 반영하도록 함
-    document.querySelector('#createQuizModal form').addEventListener('submit', function() {
-        toggleRelease();
-    });
 </script>
 
 </body>

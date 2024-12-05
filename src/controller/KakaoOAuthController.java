@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 @WebServlet("/oauth/kakao")
 public class KakaoOAuthController extends HttpServlet {
     private static final String CLIENT_ID = "5a505e392e1bb5e3f7044bf3390df0b5";
-    private static final String REDIRECT_URI = "http://localhost:8383/Quiz_war_exploded/oauth/kakao";
+    private static final String REDIRECT_URI = "http://localhost:8383/Quiz_Project/oauth/kakao";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

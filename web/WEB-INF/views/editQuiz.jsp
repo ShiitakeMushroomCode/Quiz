@@ -10,10 +10,15 @@
   <title>퀴즈 편집</title>
   <link rel="icon" href="<%= request.getContextPath() %>/static/icons/favicon.ico">
   <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/styles.css">
+
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <!-- FontAwesome CSS 추가 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
-    /* 추가적인 스타일링 */
+    /* 기존 스타일 유지 */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -34,19 +39,22 @@
     .correct-answers-list {
       list-style-type: none;
       padding-left: 0;
+      max-height: 125px;
+      overflow-y: scroll;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE and Edge */
+    }
+    .correct-answers-list::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
     }
     .correct-answers-list li {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       padding: 8px;
       margin-bottom: 5px;
       background-color: #f9f9f9;
       border: 1px solid #ccc;
       border-radius: 8px;
-    }
-    .correct-answers-list li button {
-      margin-left: 10px;
     }
     .form-control-file {
       width: 100%;
@@ -67,7 +75,8 @@
       border-radius: 4px;
     }
     /* 모달 내 옵션 입력 필드 스타일 */
-    #addItemModal .option-input {
+    #addItemModal .option-input,
+    #editItemModal .option-input {
       width: 100%;
       padding: 6px 12px;
       border: 1px solid #ccc;
@@ -87,6 +96,13 @@
       object-fit: cover;
       border: 1px solid darkgray;
     }
+
+    /* 헤더의 h1과 삭제 버튼을 수평 정렬 */
+    .header-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
@@ -94,16 +110,23 @@
 
 <div class="container">
   <br><br>
-  <h1>퀴즈 편집</h1>
 
-  <form action="yourBackendEndpoint" method="post" enctype="multipart/form-data" autocomplete="off">
+  <!-- 헤더에 삭제 버튼 추가 -->
+  <div class="header-title mb-4">
+    <h1>퀴즈 편집</h1>
+    <button type="button" class="btn btn-danger" onclick="openDeleteQuizModal()">
+      <i class="fas fa-trash-alt"></i> 삭제
+    </button>
+  </div>
+
+  <form id="editQuizForm" action="<%= request.getContextPath() %>/editQuiz" method="post" enctype="multipart/form-data" autocomplete="off">
     <ul class="list-unstyled">
       <li class="mb-3">
         <b>퀴즈 제목</b>
         <input type="text" name="detailData.title" value="${detailData.title}" required class="form-control" autocomplete="off">
       </li>
       <li class="mb-3">
-        <b>공개여부:</b>
+        <b>공개여부</b>
         <div class="custom-control custom-switch">
           <!-- 스위치가 체크되면 Y, 체크 해제되면 N을 전송 -->
           <input type="checkbox" class="custom-control-input" id="releaseSwitch" name="detailData.release" value="Y" <c:if test="${detailData.release == 'Y'}">checked</c:if> autocomplete="off">
@@ -153,7 +176,7 @@
     </ul>
     <br><br><br>
     <h2>퀴즈 세부 항목</h2>
-    <button type="button" class="btn btn-primary add-button" onclick="openAddModal()">+</button>
+    <button type="button" class="btn btn-primary add-button" onclick="openAddModal()">+ 추가</button>
     <table class="table table-bordered">
       <thead>
       <tr>
@@ -161,6 +184,7 @@
         <th>문제 이미지</th>
         <th>정답 이미지</th>
         <th>정답 목록</th>
+        <th>수정</th>
         <th>삭제</th>
       </tr>
       </thead>
@@ -170,41 +194,42 @@
           <c:forEach var="item" items="${playData.items}" varStatus="status">
             <tr>
               <td>
-                <input type="text" name="items[${status.index}].imageId" value="${item.imageId}" readonly class="form-control" autocomplete="off">
+                  ${item.detailId}
               </td>
               <td>
-                <!-- 문제 이미지 업로드 -->
+                <!-- 문제 이미지 미리보기 -->
                 <img class="quizPreview" src="${pageContext.request.contextPath}/images/${item.detailId}/${item.imageId}.Q" alt="퀴즈 이미지 미리보기">
-                <input type="file" name="items[${status.index}].problemImage" accept=".jpg,.jpeg,.png,.webp" class="form-control-file" onchange="validateImage(this)" autocomplete="off">
               </td>
               <td>
-                <!-- 정답 이미지 업로드 -->
-                <img class="correctPreview" src="${pageContext.request.contextPath}/images/${item.detailId}/${item.imageId}.C" alt="퀴즈 이미지 미리보기">
-                <input type="file" name="items[${status.index}].answerImage" accept=".jpg,.jpeg,.png,.webp" class="form-control-file" onchange="validateImage(this)" autocomplete="off">
+                <!-- 정답 이미지 미리보기 -->
+                <img class="correctPreview" src="${pageContext.request.contextPath}/images/${item.detailId}/${item.imageId}.C" alt="정답 이미지 미리보기">
               </td>
               <td>
-                <ul class="correct-answers-list" id="correctAnswersList_${status.index}">
+                <ul class="correct-answers-list" id="correctAnswersList_${item.detailId}">
                   <c:forEach var="answer" items="${item.correctAnswerSet}">
                     <li>
                       <span>${answer}</span>
-                      <button type="button" class="btn btn-sm btn-danger" onclick="removeAnswer(this)">삭제</button>
-                      <input type="hidden" name="items[${status.index}].correctAnswerSet" value="${answer}" autocomplete="off">
+                      <input type="hidden" name="items[${item.detailId}].correctAnswerSet" value="${answer}" autocomplete="off">
                     </li>
                   </c:forEach>
                 </ul>
-                <div class="add-answer-button-container">
-                  <button type="button" class="btn btn-sm btn-secondary" onclick="openModal(${status.index})">정답 추가</button>
-                </div>
               </td>
               <td>
-                <button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">삭제</button>
+                <button type="button" class="btn btn-sm btn-warning" onclick="openEditModal('${item.detailId}', '${item.imageId}')">
+                  <i class="fas fa-edit"></i> 수정
+                </button>
+              </td>
+              <td>
+                <button type="button" class="btn btn-sm btn-danger" onclick="openDeleteQuizDetailModal(this)">
+                  <i class="fas fa-trash-alt"></i> 삭제
+                </button>
               </td>
             </tr>
           </c:forEach>
         </c:when>
         <c:otherwise>
           <tr>
-            <td colspan="5" style="text-align: center;">퀴즈 세부 항목이 없습니다.</td>
+            <td colspan="6" style="text-align: center;">퀴즈 세부 항목이 없습니다.</td>
           </tr>
         </c:otherwise>
       </c:choose>
@@ -212,7 +237,9 @@
     </table>
 
     <br/>
-    <button type="submit" class="btn btn-success">저장</button>
+
+    <!-- 저장 버튼을 type="button"으로 변경하고 클릭 시 모달 열기 -->
+    <button type="button" class="btn btn-success" onclick="openSaveModal()">저장</button>
   </form>
 </div>
 
@@ -244,6 +271,7 @@
           <div class="form-group">
             <label>정답 목록</label>
             <div id="newAnswersContainer">
+              <!-- 정답 입력 필드 초기화 (삭제 버튼 포함) -->
               <div class="input-group mb-2">
                 <input type="text" class="form-control answer-input" placeholder="정답 입력" required autocomplete="off">
                 <div class="input-group-append">
@@ -265,58 +293,176 @@
   </div>
 </div>
 
-<!-- 정답 추가 모달 -->
-<div class="modal fade" id="answerModal" tabindex="-1" role="dialog" aria-labelledby="answerModalLabel" aria-hidden="true">
+<!-- 퀴즈 세부 항목 수정 모달 -->
+<div class="modal fade" id="editItemModal" tabindex="-1" role="dialog" aria-labelledby="editItemModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form id="answerForm">
+      <form id="editItemForm" action="<%= request.getContextPath() %>/editQuizDetail" method="post" enctype="multipart/form-data" autocomplete="off">
         <div class="modal-header">
-          <h5 class="modal-title" id="answerModalLabel">정답 추가</h5>
+          <h5 class="modal-title" id="editItemModalLabel">퀴즈 세부 항목 수정</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="닫기">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
+          <!-- 세부 항목 ID (수정 불가) -->
           <div class="form-group">
-            <label for="newAnswer">정답</label>
-            <input type="text" class="form-control" id="newAnswer" required autocomplete="off">
+            <label for="editDetailId">세부 항목 ID</label>
+            <input type="text" class="form-control" id="editDetailId" name="detailId" readonly autocomplete="off">
           </div>
-          <input type="hidden" id="currentRowIndex" value="">
+          <div class="form-group">
+            <label for="editProblemImage">문제 이미지</label><br>
+            <img id="editProblemImagePreview" src="" alt="문제 이미지 미리보기" class="quizPreview mb-2">
+            <input type="file" class="form-control-file" id="editProblemImage" name="problemImage" accept=".jpg,.jpeg,.png,.webp" onchange="validateImage(this)" autocomplete="off">
+            <small class="form-text text-muted">새로운 이미지로 교체하려면 파일을 선택하세요.</small>
+          </div>
+          <div class="form-group">
+            <label for="editAnswerImage">정답 이미지</label><br>
+            <img id="editAnswerImagePreview" src="" alt="정답 이미지 미리보기" class="correctPreview mb-2">
+            <input type="file" class="form-control-file" id="editAnswerImage" name="answerImage" accept=".jpg,.jpeg,.png,.webp" onchange="validateImage(this)" autocomplete="off">
+            <small class="form-text text-muted">새로운 이미지로 교체하려면 파일을 선택하세요.</small>
+          </div>
+          <div class="form-group">
+            <label>정답 목록</label>
+            <div id="editAnswersContainer">
+              <!-- 기존 정답 목록이 동적으로 추가됩니다 (삭제 버튼 포함) -->
+            </div>
+            <div class="add-answer-button-container">
+              <button type="button" class="btn btn-sm btn-secondary" onclick="addEditAnswerInput()">+ 정답 추가</button>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
-          <button type="submit" class="btn btn-primary">추가</button>
+          <button type="submit" class="btn btn-primary">수정</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-<!-- Bootstrap JS 및 의존성 스크립트 -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<!-- 퀴즈 삭제 확인 모달 (기존) -->
+<div class="modal fade" id="deleteQuizModal" tabindex="-1" role="dialog" aria-labelledby="deleteQuizModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="deleteQuizForm" action="<%= request.getContextPath() %>/deleteQuiz" method="post">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteQuizModalLabel">퀴즈 삭제</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="닫기">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          정말로 이 퀴즈를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+          <button type="submit" class="btn btn-danger">삭제</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 퀴즈 세부 항목 삭제 확인 모달 (기존) -->
+<div class="modal fade" id="deleteQuizDetailModal" tabindex="-1" role="dialog" aria-labelledby="deleteQuizDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteQuizDetailModalLabel">세부 항목 삭제</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="닫기">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        정말로 이 세부 항목을 삭제하시겠습니까?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" onclick="confirmDeleteQuizDetail()">삭제</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 저장 확인 모달 (기존) -->
+<div class="modal fade" id="saveQuizModal" tabindex="-1" role="dialog" aria-labelledby="saveQuizModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="saveQuizModalLabel">퀴즈 저장</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="닫기">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        퀴즈를 저장하시겠습니까?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" onclick="submitEditQuizForm()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var contextPath = '<%= request.getContextPath() %>';
+</script>
+
+<!-- JavaScript 코드 -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
   // 현재 최대 세부 항목 ID 저장
   let currentMaxId = 0;
 
-  // 페이지 로드 시 현재 최대 세부 항목 ID 초기화
+  // 삭제할 세부 항목의 행을 저장할 변수
+  let rowToDelete = null;
+
+  // 퀴즈 세부 항목을 수정할 때 사용할 변수
+  let editRowIndex = null;
+
+  // 페이지 로드 시 현재 최대 세부 항목 ID 초기화 및 공개여부 스위치 상태 설정
   document.addEventListener('DOMContentLoaded', function() {
     const tableBody = document.getElementById('itemsTableBody');
     const rows = tableBody.getElementsByTagName('tr');
     let maxId = 0;
     for (let row of rows) {
-      const idInput = row.querySelector('input[name$=".detailId"]');
-      if (idInput) {
-        const idValue = parseInt(idInput.value);
-        if (!isNaN(idValue) && idValue > maxId) {
-          maxId = idValue;
-        }
+      const detailId = row.cells[0].innerText;
+      const idValue = parseInt(detailId);
+      if (!isNaN(idValue) && idValue > maxId) {
+        maxId = idValue;
       }
     }
     currentMaxId = maxId;
     updateOptionLimits();
+    updateReleaseSwitch();
+    enforceOptionLimits();
   });
+
+  // 모달 열기 함수 (퀴즈 삭제)
+  function openDeleteQuizModal() {
+    $('#deleteQuizModal').modal('show');
+  }
+
+  // 모달 열기 함수 (퀴즈 세부 항목 삭제)
+  function openDeleteQuizDetailModal(button) {
+    rowToDelete = button.closest('tr');
+    $('#deleteQuizDetailModal').modal('show');
+  }
+
+  // 퀴즈 세부 항목 삭제 확인 함수
+  function confirmDeleteQuizDetail() {
+    if (rowToDelete) {
+      rowToDelete.remove();
+      rowToDelete = null;
+      $('#deleteQuizDetailModal').modal('hide');
+      updateOptionLimits();
+      updateReleaseSwitch();
+    }
+  }
 
   // 모달 열기 함수 (세부 항목 추가)
   function openAddModal() {
@@ -324,84 +470,35 @@
     currentMaxId += 1;
     document.getElementById('newdetailId').value = currentMaxId;
 
-    // 기존 정답 입력 필드 초기화
+    // 기존 정답 입력 필드 초기화 (삭제 버튼 포함)
     const answersContainer = document.getElementById('newAnswersContainer');
-    answersContainer.innerHTML = `
-      <div class="input-group mb-2">
-        <input type="text" class="form-control answer-input" placeholder="정답 입력" required autocomplete="off">
-        <div class="input-group-append">
-          <button class="btn btn-danger remove-answer-btn" type="button" onclick="removeAnswerInput(this)">-</button>
-        </div>
-      </div>
-    `;
+    answersContainer.innerHTML =
+            '<div class="input-group mb-2">' +
+            '<input type="text" class="form-control answer-input" placeholder="정답 입력" required autocomplete="off">' +
+            '<div class="input-group-append">' +
+            '<button class="btn btn-danger remove-answer-btn" type="button" onclick="removeAnswerInput(this)">-</button>' +
+            '</div>' +
+            '</div>';
     $('#addItemModal').modal('show');
   }
 
-  // 정답 입력 필드 추가 함수
+  // 정답 입력 필드 추가 함수 (추가 모달)
   function addAnswerInput() {
     const answersContainer = document.getElementById('newAnswersContainer');
     const newInputGroup = document.createElement('div');
     newInputGroup.className = 'input-group mb-2';
-    newInputGroup.innerHTML = `
-      <input type="text" class="form-control answer-input" placeholder="정답 입력" required autocomplete="off">
-      <div class="input-group-append">
-        <button class="btn btn-danger remove-answer-btn" type="button" onclick="removeAnswerInput(this)">-</button>
-      </div>
-    `;
+    newInputGroup.innerHTML =
+            '<input type="text" class="form-control answer-input" placeholder="정답 입력" required autocomplete="off">' +
+            '<div class="input-group-append">' +
+            '<button class="btn btn-danger remove-answer-btn" type="button" onclick="removeAnswerInput(this)">-</button>' +
+            '</div>';
     answersContainer.appendChild(newInputGroup);
   }
 
-  // 정답 입력 필드 삭제 함수
+  // 정답 입력 필드 삭제 함수 (추가 모달)
   function removeAnswerInput(button) {
     const inputGroup = button.closest('.input-group');
     inputGroup.remove();
-  }
-
-  // 정답 추가 모달 열기 함수
-  function openModal(index) {
-    currentRowIndex = index;
-    document.getElementById('currentRowIndex').value = index;
-    document.getElementById('newAnswer').value = '';
-    $('#answerModal').modal('show');
-  }
-
-  // 정답 추가 함수
-  document.getElementById('answerForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const answerInput = document.getElementById('newAnswer');
-    const answer = answerInput.value.trim();
-    const rowIndex = document.getElementById('currentRowIndex').value;
-
-    if (answer === '') {
-      alert('정답을 입력해주세요.');
-      return;
-    }
-
-    // 정답 목록에 추가
-    const answersList = document.getElementById(`correctAnswersList_${rowIndex}`);
-    const listItem = document.createElement('li');
-    listItem.innerHTML = `
-      <span>${answer}</span>
-      <button type="button" class="btn btn-sm btn-danger" onclick="removeAnswer(this)">삭제</button>
-      <input type="hidden" name="items[${rowIndex}].correctAnswerSet" value="${answer}" autocomplete="off">
-    `;
-    answersList.appendChild(listItem);
-
-    // 모달 닫기
-    $('#answerModal').modal('hide');
-  });
-
-  // 행 삭제 함수
-  function removeRow(button) {
-    const row = button.closest('tr');
-    row.remove();
-    updateOptionLimits();
-  }
-
-  // 정답 삭제 함수
-  function removeAnswer(button) {
-    const listItem = button.closest('li');
-    listItem.remove();
   }
 
   // 퀴즈 세부 항목 추가 모달 폼 제출 함수
@@ -426,67 +523,54 @@
       return;
     }
 
+    // imageId는 detailId와 동일하게 설정 (필요에 따라 별도로 생성 가능)
+    const imageId = detailId;
+
     // 테이블에 새로운 행 추가
     const tableBody = document.getElementById('itemsTableBody');
-    const rowCount = tableBody.getElementsByTagName('tr').length;
-    const newIndex = rowCount;
+    const newIndex = detailId; // detailId를 인덱스로 사용
 
     const newRow = document.createElement('tr');
 
-    // 세부 항목 ID - 읽기 전용으로 설정
+    // 세부 항목 ID
     const detailIdCell = document.createElement('td');
-    const detailIdInput = document.createElement('input');
-    detailIdInput.type = 'text';
-    detailIdInput.name = `items[${newIndex}].detailId`;
-    detailIdInput.value = detailId;
-    detailIdInput.readOnly = true;
-    detailIdInput.className = "form-control";
-    detailIdInput.setAttribute('autocomplete', 'off');
-    detailIdCell.appendChild(detailIdInput);
+    detailIdCell.innerText = detailId;
     newRow.appendChild(detailIdCell);
 
-    // 문제 이미지 업로드
+    // 문제 이미지 미리보기
     const problemImageCell = document.createElement('td');
-    const problemImageInput = document.createElement('input');
-    problemImageInput.type = 'file';
-    problemImageInput.name = `items[${newIndex}].problemImage`;
-    problemImageInput.accept = '.jpg,.jpeg,.png,.webp';
-    problemImageInput.className = 'form-control-file';
-    problemImageInput.onchange = function() { validateImage(this); };
-    problemImageInput.setAttribute('autocomplete', 'off');
-    problemImageCell.appendChild(problemImageInput);
+    const problemImg = document.createElement('img');
+    problemImg.className = 'quizPreview';
+    problemImg.src = contextPath + "/images/" + detailId + "/" + imageId + ".Q";
+    problemImageCell.appendChild(problemImg);
     newRow.appendChild(problemImageCell);
 
-    // 정답 이미지 업로드
+    // 정답 이미지 미리보기
     const answerImageCell = document.createElement('td');
-    const answerImageInput = document.createElement('input');
-    answerImageInput.type = 'file';
-    answerImageInput.name = `items[${newIndex}].answerImage`;
-    answerImageInput.accept = '.jpg,.jpeg,.png,.webp';
-    answerImageInput.className = 'form-control-file';
-    answerImageInput.onchange = function() { validateImage(this); };
-    answerImageInput.setAttribute('autocomplete', 'off');
-    answerImageCell.appendChild(answerImageInput);
+    const answerImg = document.createElement('img');
+    answerImg.className = 'correctPreview';
+    answerImg.src = contextPath + "/images/" + detailId + "/" + imageId + ".C";
+    answerImageCell.appendChild(answerImg);
     newRow.appendChild(answerImageCell);
 
-    // 정답 목록
+    // 정답 목록 (삭제 버튼 없음)
     const correctAnswersCell = document.createElement('td');
     const answersList = document.createElement('ul');
     answersList.className = 'correct-answers-list';
-    answersList.id = `correctAnswersList_${newIndex}`;
+    answersList.id = 'correctAnswersList_' + detailId;
     correctAnswersCell.appendChild(answersList);
 
     answers.forEach(answer => {
       const listItem = document.createElement('li');
-      listItem.innerHTML = `
-        <span>${answer}</span>
-        <button type="button" class="btn btn-sm btn-danger" onclick="removeAnswer(this)">삭제</button>
-        <input type="hidden" name="items[${newIndex}].correctAnswerSet" value="${answer}" autocomplete="off">
-      `;
+      listItem.innerHTML =
+              '<span>' + answer + '</span>' +
+              '<input type="hidden" name="items[' + detailId + '].correctAnswerSet" value="' + answer + '" autocomplete="off">';
       answersList.appendChild(listItem);
     });
 
-    // 정답 추가 버튼 가운데 정렬
+    // 정답 추가 버튼 제거
+    // 주석 처리 또는 삭제
+    /*
     const addAnswerButtonContainer = document.createElement('div');
     addAnswerButtonContainer.className = 'add-answer-button-container';
     const addAnswerButton = document.createElement('button');
@@ -494,20 +578,34 @@
     addAnswerButton.className = 'btn btn-sm btn-secondary';
     addAnswerButton.textContent = '정답 추가';
     addAnswerButton.onclick = function() {
-      openModal(newIndex);
+      openModal(detailId);
     };
     addAnswerButtonContainer.appendChild(addAnswerButton);
     correctAnswersCell.appendChild(addAnswerButtonContainer);
+    */
+
     newRow.appendChild(correctAnswersCell);
+
+    // 수정 버튼 추가
+    const editCell = document.createElement('td');
+    const editButton = document.createElement('button');
+    editButton.type = 'button';
+    editButton.className = 'btn btn-sm btn-warning';
+    editButton.innerHTML = '<i class="fas fa-edit"></i> 수정';
+    editButton.onclick = function() {
+      openEditModal(detailId, imageId);
+    };
+    editCell.appendChild(editButton);
+    newRow.appendChild(editCell);
 
     // 삭제 버튼 추가
     const deleteCell = document.createElement('td');
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
     deleteButton.className = 'btn btn-sm btn-danger';
-    deleteButton.textContent = '삭제';
+    deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i> 삭제';
     deleteButton.onclick = function() {
-      removeRow(deleteButton);
+      openDeleteQuizDetailModal(deleteButton);
     };
     deleteCell.appendChild(deleteButton);
     newRow.appendChild(deleteCell);
@@ -515,22 +613,22 @@
     // 새 행을 테이블 하단에 추가
     tableBody.appendChild(newRow);
     updateOptionLimits();
+    updateReleaseSwitch();
 
     // 모달 닫기 및 폼 초기화
     $('#addItemModal').modal('hide');
     document.getElementById('addItemForm').reset();
-    // 정답 입력 필드 초기화
-    document.getElementById('newAnswersContainer').innerHTML = `
-      <div class="input-group mb-2">
-        <input type="text" class="form-control answer-input" placeholder="정답 입력" required autocomplete="off">
-        <div class="input-group-append">
-          <button class="btn btn-danger remove-answer-btn" type="button" onclick="removeAnswerInput(this)">-</button>
-        </div>
-      </div>
-    `;
+    // 정답 입력 필드 초기화 (삭제 버튼 포함)
+    document.getElementById('newAnswersContainer').innerHTML =
+            '<div class="input-group mb-2">' +
+            '<input type="text" class="form-control answer-input" placeholder="정답 입력" required autocomplete="off">' +
+            '<div class="input-group-append">' +
+            '<button class="btn btn-danger remove-answer-btn" type="button" onclick="removeAnswerInput(this)">-</button>' +
+            '</div>' +
+            '</div>';
   });
 
-  // 이미지 파일 유효성 검사 함수
+  // 이미지 파일 유효성 검사 함수 (기존)
   function validateImage(input) {
     const file = input.files[0];
     if (file) {
@@ -543,7 +641,7 @@
     }
   }
 
-  // 옵션 입력 필드의 최대값을 퀴즈 세부 항목 개수로 제한
+  // 옵션 입력 필드의 최대값을 퀴즈 세부 항목 개수로 제한 (기존)
   function updateOptionLimits() {
     const optionInputs = document.querySelectorAll('.option-input');
     const itemsTableBody = document.getElementById('itemsTableBody');
@@ -554,7 +652,21 @@
     });
   }
 
-  // 옵션 입력 필드의 값 변경 시 제한을 확인
+  // 공개여부 스위치 활성화/비활성화 함수 (기존)
+  function updateReleaseSwitch() {
+    const itemsTableBody = document.getElementById('itemsTableBody');
+    const rowCount = itemsTableBody.getElementsByTagName('tr').length;
+    const releaseSwitch = document.getElementById('releaseSwitch');
+
+    if (rowCount > 0) {
+      releaseSwitch.disabled = false;
+    } else {
+      releaseSwitch.disabled = true;
+      releaseSwitch.checked = false;
+    }
+  }
+
+  // 옵션 입력 필드의 값 변경 시 제한을 확인 (기존)
   function enforceOptionLimits() {
     const optionInputs = document.querySelectorAll('.option-input');
     optionInputs.forEach(input => {
@@ -563,7 +675,7 @@
         const value = parseInt(this.value);
         if (value > max) {
           this.value = max;
-          alert(`옵션 값은 최대 ${max}까지 가능합니다.`);
+          alert('옵션 값은 최대 ' + max + '까지 가능합니다.');
         } else if (value < 0) {
           this.value = 0;
           alert('옵션 값은 0 이상이어야 합니다.');
@@ -572,19 +684,108 @@
     });
   }
 
-  // 초기 옵션 제한 설정
+  // 저장 버튼 클릭 시 모달 열기 (기존)
+  function openSaveModal() {
+    $('#saveQuizModal').modal('show');
+  }
+
+  // 저장 확인 시 폼 제출 (기존)
+  function submitEditQuizForm() {
+    document.getElementById('editQuizForm').submit();
+  }
+
+  // 초기 옵션 제한 설정 (기존)
   document.addEventListener('DOMContentLoaded', function() {
     enforceOptionLimits();
   });
 
-  // 테이블에 행이 추가되거나 제거될 때 옵션 제한을 업데이트
+  // 테이블에 행이 추가되거나 제거될 때 옵션 제한을 업데이트 (기존)
   const observer = new MutationObserver(function(mutationsList, observer) {
     updateOptionLimits();
+    updateReleaseSwitch();
   });
 
   const tableBody = document.getElementById('itemsTableBody');
   observer.observe(tableBody, { childList: true });
 
+  // 퀴즈 세부 항목 수정 모달 열기 함수
+  function openEditModal(detailId, imageId) {
+    // editRowIndex를 detailId로 설정
+    editRowIndex = detailId;
+
+    // 세부 항목 ID 설정
+    document.getElementById('editDetailId').value = detailId;
+    // 문제 이미지 미리보기 설정
+    document.getElementById('editProblemImagePreview').src = contextPath + "/images/" + detailId + "/" + imageId + ".Q";
+    // 정답 이미지 미리보기 설정
+    document.getElementById('editAnswerImagePreview').src = contextPath + "/images/" + detailId + "/" + imageId + ".C";
+
+    // 기존 정답 목록 가져오기
+    const answersList = document.getElementById('correctAnswersList_' + detailId);
+    const editAnswersContainer = document.getElementById('editAnswersContainer');
+    editAnswersContainer.innerHTML = ''; // 초기화
+
+    if (answersList) {
+      const answers = answersList.querySelectorAll('li');
+      answers.forEach((li) => {
+        const answerValue = li.querySelector('span').innerText;
+        const inputGroup = document.createElement('div');
+        inputGroup.className = 'input-group mb-2';
+        inputGroup.innerHTML =
+                '<input type="hidden" name="items[' + detailId + '].originalCorrectAnswerSet" value="' + answerValue + '" autocomplete="off">' +
+                '<input type="text" class="form-control answer-input" name="items[' + detailId + '].correctAnswerSet" value="' + answerValue + '" required autocomplete="off">' +
+                '<div class="input-group-append">' +
+                '<button class="btn btn-danger remove-answer-btn" type="button" onclick="removeEditAnswerInput(this)">-</button>' +
+                '</div>';
+        editAnswersContainer.appendChild(inputGroup);
+      });
+    }
+
+    $('#editItemModal').modal('show');
+  }
+
+  // 정답 입력 필드 추가 함수 (수정 모달)
+  function addEditAnswerInput() {
+    const editAnswersContainer = document.getElementById('editAnswersContainer');
+    const newInputGroup = document.createElement('div');
+    newInputGroup.className = 'input-group mb-2';
+    newInputGroup.innerHTML =
+            '<input type="text" class="form-control answer-input" name="items[' + editRowIndex + '].correctAnswerSet" placeholder="정답 입력" required autocomplete="off">' +
+            '<div class="input-group-append">' +
+            '<button class="btn btn-danger remove-answer-btn" type="button" onclick="removeEditAnswerInput(this)">-</button>' +
+            '</div>';
+    editAnswersContainer.appendChild(newInputGroup);
+  }
+
+  // 정답 입력 필드 삭제 함수 (수정 모달)
+  function removeEditAnswerInput(button) {
+    const inputGroup = button.closest('.input-group');
+    inputGroup.remove();
+  }
+
+  // 퀴즈 세부 항목 수정 모달 폼 제출 함수
+  document.getElementById('editItemForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const form = this;
+    const formData = new FormData(form);
+
+    // AJAX를 사용하여 수정 요청을 보냅니다.
+    $.ajax({
+      url: form.action,
+      type: form.method,
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function(response) {
+        // 성공 시 페이지를 새로 고침하거나 필요한 작업을 수행합니다.
+        location.reload();
+      },
+      error: function(xhr, status, error) {
+        alert('수정 중 오류가 발생했습니다.');
+      }
+    });
+  });
 </script>
 </body>
 </html>
